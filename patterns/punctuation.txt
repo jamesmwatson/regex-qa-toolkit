@@ -1,0 +1,11 @@
+# Double punctuation
+([!?.,])\1+
+
+# Mixed punctuation
+([!?])([.,])
+
+# Ellipsis written as 2 dots
+[^.]?\.\.[^.]
+
+# Repeated comma or semicolon
+([,;])\s*\1

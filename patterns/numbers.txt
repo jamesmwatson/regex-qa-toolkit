@@ -1,0 +1,11 @@
+# Number with comma as decimal (English check)
+\d+,\d+
+
+# Number with point as decimal (European check)
+\d+\.\d+
+
+# Number with thin space / no separator where expected
+\d{5,}
+
+# Mixed decimal separators in same text
+(?=.*\d+\.\d+)(?=.*\d+,\d+)
