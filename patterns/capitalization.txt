@@ -1,8 +1,0 @@
-# Sentence not starting with capital
-(?<=^|[.!?]\s)([a-z])
-
-# Capital letter in mid-sentence (false proper noun)
-(?<![.!?]\s)(?<!^)[A-Z][a-z]+
-
-# ALL CAPS word (potential acronym or shouting)
-\b[A-Z]{3,}\b

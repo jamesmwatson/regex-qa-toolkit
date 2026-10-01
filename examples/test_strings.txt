@@ -1,8 +1,0 @@
-This  sentence  has  double  spaces.
-Missing space after comma,here it is.
-There are two dots.. right here.
-3,14159 versus 3.14159.
-the sentence starts lowercase.
-THIS is shouting.
-Mixed EnglishРусский text.
-Space before punctuation !
