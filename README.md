@@ -1,10 +1,19 @@
 # Regex QA Toolkit
 
-A production-informed toolkit of regex-based QA checks for translation and localisation workflows. The checks target recurring formatting, numerical, punctuation and linguistic issues and surface **candidates for human review**.
+I built this toolkit around a problem I ran into repeatedly as a translator and reviewer: the same small QA issue can crop up in dozens of completely different segments.
 
-In technical translation, different sentences can share the same small problem: `25mm`, an English target containing `12,5`, or an accidental `the the`. Regex makes those recurring shapes searchable across otherwise different segments. The reviewer still decides whether a match is wrong, what the source means and which locale or house style applies.
+A regex can pull those cases together: `25mm`, a decimal comma in an English target or an accidental `the the`. It's much faster than checking them one by one. It can't tell you that every match is wrong, though. The useful part is combining pattern matching with the source text, the project style and linguistic judgement.
 
-**Workflow:** translate or post-edit → run native CAT-tool QA plus selected regex checks → inspect source, target and context → correct or accept each finding → rerun QA.
+I worked mainly on technical and commercial German-to-English material, so the examples here lean towards measurements, numbers, punctuation and English usage. Some checks grew out of working notes and earlier QA patterns; others are small examples I've added to demonstrate the same approach. All sample content is fictional.
+
+## Checks in action
+
+![Regex QA running in Trados Studio](/screenshots/trados-regex-qa-overview.png)
+Selected regex checks running in Trados Studio 2019 QA Checker 3.0 on a fictional DE→EN technical project. Findings include measurement formatting, repeated whitespace and language-level review candidates.
+
+![A match still needs judgement](/screenshots/trados-regex-human-review.png)
+Two findings from the same QA pass: `the the` is an accidental repetition, while `state of the art` is correct here as a noun phrase and is deliberately accepted. A regex match is a review candidate, not automatically an error.
+
 
 ## Start here
 
@@ -19,25 +28,24 @@ In technical translation, different sentences can share the same small problem: 
 | [Text and consistency](patterns/text-and-consistency.md) | Review repeated words and possible missing final punctuation in sentence-like content. |
 | [English / locale-specific](patterns/language-specific.md) | Inventory `color/colour`, check selected `-ize` forms against an `-ise` house style and review `state of the art` in context. |
 
-## Why this existed in practice
+## Why use regex for QA
 
 I worked for around ten years as a professional translator and reviewer, mainly on technical and commercial German-to-English material. Regex was one of the practical tools I used to find recurring formatting, numerical, terminology and text-quality issues in CAT-tool workflows.
 
 A measurement can recur with a different value in every segment; a small punctuation problem can be scattered through product descriptions. A focused query brings those instances together for review. Useful QA also means knowing when to leave a match alone: a product name, a code token, a valid thousands separator or a grammatical repetition.
 
-This repository turns that background into a small, documented portfolio collection. **Production-informed describes the problem selection and review approach; it does not mean every expression here was deployed in paid work.** Individual checks identify whether they were adapted from the original collection, translator notes or generated candidate suggestions, or written as illustrative examples. All examples are fictional; no client material is included.
+This repository turns that background into a small, documented portfolio collection. The collection mixes patterns adapted from my own working notes and earlier toolkit with examples developed specifically for this portfolio. All sample content is fictional and no client material is included.
 
 ## Using the checks
 
-Copy a check into a regex-capable CAT tool, text editor or segment-processing workflow. Trados is one relevant environment; no CAT tool is required to read or use the collection. Start with the project's source/target locales, content types and style guide, then enable only relevant checks. A colour inventory or numeric filter selects material; it does not assert an error.
+Copy a check into a regex-capable CAT tool or text editor. Trados is one relevant environment but you don't need a CAT tool to use these checks or find them useful. Regex is supported in a surprising number of editors and other text-processing tools, so the same habits transfer quite well.
 
 The expressions and documented examples are exercised directly by a small Python standard-library script:
 
 ```sh
 python3 tests/run_tests.py
 ```
-
-Python is optional for using the patterns. There are no third-party dependencies, application or automatic replacements. Validation here covers Python's regex engine; repeat the examples in your actual CAT tool before relying on its flags, boundaries or tag handling.
+Selected checks have also been run successfully in Trados Studio 2019 QA Checker 3.0 against the fictional DE→EN project shown above.
 
 ## Limits that affect review
 
@@ -45,5 +53,3 @@ Python is optional for using the patterns. There are no third-party dependencies
 - **Language and content type matter.** English punctuation rules do not transfer unchanged to French; headings and UI labels may need no full stop; UK English does not imply a universal `-ise` rule.
 - **Text checks cannot see everything.** Tags, placeholders, source–target omissions and cross-segment terminology require appropriate native QA, comparison or human review. Do not strip tags to make a regex work.
 - **Coverage is deliberately narrow.** ASCII digits, selected units and English word forms are documented choices. A non-match means only that this particular check found nothing. These checks can assist human or AI-generated translation review, but cannot assess overall translation quality.
-
-See the [work log](WORK_LOG.md) for selection decisions, repairs and rejected candidates.
