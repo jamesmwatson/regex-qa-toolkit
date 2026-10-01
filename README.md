@@ -8,8 +8,6 @@ I worked mainly on technical and commercial German-to-English material, so the e
 
 ## Why use regex for QA
 
-Regex was one of the practical tools I used during around ten years as a professional translator and reviewer, mainly on technical and commercial German-to-English material.
-
 A measurement can recur with a different value in every segment; a small punctuation problem can be scattered through product descriptions. A focused query brings those instances together for review. Useful QA also means knowing when to leave a match alone: a product name, a code token, a valid thousands separator or a grammatical repetition.
 
 This repository turns that background into a small, documented portfolio collection. The collection mixes patterns adapted from my own working notes and earlier toolkit with examples developed specifically for this portfolio. All sample content is fictional and no client material is included.
