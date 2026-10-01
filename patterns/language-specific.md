@@ -16,13 +16,13 @@ I’d use these checks to review English spelling and phrasing against a project
 
 **If found:** Compare the wording with the project’s preferred spelling and the kind of content. I’d correct ordinary prose where needed, while preserving code and official names or labels.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Choose a color."` | `["color"]` | US form found. |
 | `"Choose a colour."` | `["colour"]` | UK form found too; not an error by itself. |
-| `"COLOR / colour"` | `["COLOR", "colour"]` | Case-insensitive inventory. |
+| `"COLOR / colour"` | `["COLOR", "colour"]` | Finds both spellings regardless of case. |
 | `"Choose a shade."` | `[]` | Useful non-match. |
-| `"discoloration"` | `[]` | No substring match. |
+| `"discoloration"` | `[]` | Does not match `color` when it appears inside a longer word. |
 | `"colors"` | `[]` | Plural intentionally outside scope. |
 | `"CSS color: red;"` | `["color"]` | Known acceptable match: code token. |
 
@@ -40,13 +40,13 @@ I’d use these checks to review English spelling and phrasing against a project
 
 **If found:** Check the house style and context, then change the spelling where appropriate. I’d preserve the existing capitalisation, leave official names alone and review words individually rather than make a general `z-to-s` replacement.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
-| `"Optimize the process."` | `["Optimize"]` | Selected word family. |
+| `"Optimize the process."` | `["Optimize"]` | `Optimize` is one of the selected -ize forms this check looks for. |
 | `"Review localization and customized labels."` | `["localization", "customized"]` | Noun and inflected verb. |
 | `"Optimise the process."` | `[]` | Useful non-match: s-spelling. |
-| `"Check size and prize."` | `[]` | Exception words never enter the allowlist. |
-| `"Do not capsize or seize it."` | `[]` | More counterexamples to blanket replacement. |
+| `"Check size and prize."` | `[]` | Words such as `size` and `prize` are not part of the selected list. |
+| `"Do not capsize or seize it."` | `[]` | Shows why a blanket `z → s` replacement would be unsafe. |
 | `"Analyze the result."` | `[]` | Unlisted spelling difference outside scope. |
 | `"Product name: Optimize."` | `["Optimize"]` | Known acceptable match if it is a protected name. |
 
@@ -64,11 +64,11 @@ I’d use these checks to review English spelling and phrasing against a project
 
 **If found:** Read the whole phrase. I’d hyphenate an attributive use such as `state-of-the-art equipment` where the house style calls for it, and leave the noun phrase `the state of the art` unchanged.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Use state of the art equipment."` | `["state of the art"]` | Candidate attributive phrase. |
 | `"STATE OF THE ART equipment"` | `["STATE OF THE ART"]` | Case-insensitive. |
 | `"Use state-of-the-art equipment."` | `[]` | Useful non-match: already hyphenated. |
 | `"The state of the art is changing."` | `["state of the art"]` | Known acceptable noun phrase. |
-| `"state of the artist"` | `[]` | Whole-word boundary. |
+| `"state of the artist"` | `[]` | Does not match the longer word `artist`. |
 | `"state\nof the art"` | `[]` | No cross-line match. |

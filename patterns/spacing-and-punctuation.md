@@ -16,10 +16,10 @@ I’d use these checks to pick up small spacing and punctuation problems in Engl
 
 **If found:** Check whether the spacing serves a purpose. In ordinary prose, I’d usually reduce an accidental run to one space, keeping a non-breaking space where the text or project style needs it.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Press  start."` | `["  "]` | Candidate: accidental double space. |
-| `"This  sentence  has  double  spaces."` | `["  ", "  ", "  ", "  "]` |  find every run. |
+| `"This  sentence  has  double  spaces."` | `["  ", "  ", "  ", "  "]` | Finds each repeated-space run separately. |
 | `"Press \tstart."` | `[" \t"]` | Mixed horizontal whitespace. |
 | `"Press\u00a0\u202fstart."` | `["\u00a0\u202f"]` | Two different non-breaking spaces. |
 | `"Press start."` | `[]` | Useful non-match: one space. |
@@ -41,9 +41,9 @@ I’d use these checks to pick up small spacing and punctuation problems in Engl
 
 **If found:** Read the surrounding text and remove an accidental space, keeping the punctuation. If the match belongs to another language or to notation, I’d check the relevant convention before changing it.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
-| `"Space before punctuation !"` | `[" !"]` |  |
+| `"Space before punctuation !"` | `[" !"]` | Candidate space before an exclamation mark. |
 | `"Check , then continue."` | `[" ,"]` | Candidate: space before comma. |
 | `"Ready\u202f?"` | `["\u202f?"]` | Narrow NBSP in English target. |
 | `"Ready?"` | `[]` | Useful non-match. |
@@ -64,9 +64,9 @@ I’d use these checks to pick up small spacing and punctuation problems in Engl
 
 **If found:** Check the sentence and, where useful, the source to decide whether a full stop or an ellipsis was intended. I’d leave valid notation alone and query ambiguous wording rather than choose a replacement automatically.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
-| `"There are two dots.. right here."` | `[".."]` |  |
+| `"There are two dots.. right here."` | `[".."]` | Candidate doubled full stop in ordinary prose. |
 | `"Done.."` | `[".."]` | Detect at end of segment. |
 | `"..Start"` | `[".."]` | Detect at start without consuming adjacent letters. |
 | `"Wait..."` | `[]` | Useful non-match: three-dot ellipsis. |

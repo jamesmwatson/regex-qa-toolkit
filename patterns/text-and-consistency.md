@@ -16,11 +16,11 @@ These checks help me find repeated words and possible missing punctuation in tra
 
 **If found:** Read the clause before deleting anything. I’d remove an accidental duplicate, but keep a repetition that the grammar or meaning requires.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Check the the valve."` | `["the the"]` | Candidate accidental repetition. |
 | `"The the valve is closed."` | `["The the"]` | Case-insensitive match. |
-| `"Check the\u00a0the valve."` | `["the\u00a0the"]` | NBSP separator. |
+| `"Check the\u00a0the valve."` | `["the\u00a0the"]` | Still matches when the repeated words are separated by a non-breaking space. |
 | `"Check the valve."` | `[]` | Useful non-match. |
 | `"She had had enough."` | `["had had"]` | Known false positive: grammatical repetition. |
 | `"No, no."` | `[]` | Punctuation interrupts the repetition. |
@@ -38,11 +38,11 @@ These checks help me find repeated words and possible missing punctuation in tra
 
 **When I'd use it:** On full sentences in instructions or running prose. I’d select that material first, rather than run the check indiscriminately over headings, UI labels and lists.
 
-**Watch out for:** Those shorter text types often need no final punctuation. This deliberately narrow check looks for an ASCII letter or digit at the end, allowing trailing horizontal whitespace. It misses unpunctuated text ending in a closing quote, bracket or non-ASCII letter, and it won’t spot an incorrect punctuation mark that is already present. Keep multiline mode off; in Python, the end anchor also permits a match just before a final newline.
+**Watch out for:** Those shorter text types often need no final punctuation. This deliberately narrow check looks for an ASCII letter or digit at the end, allowing trailing horizontal whitespace. It misses unpunctuated text ending in a closing quote, bracket or non-ASCII letter, and it won’t spot an incorrect punctuation mark that is already present. Keep this check scoped to one segment at a time; line-ending and anchor behaviour can vary between regex engines.
 
 **If found:** Decide whether the segment is a full sentence and check the project style. I’d add appropriate punctuation where it is missing, or leave a heading or label as it stands. The source can help clarify the context, but its punctuation may not be right for the target.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Close the valve"` | `["Close the valve"]` | Candidate missing full stop in a sentence. |
 | `"Set pressure to 5 "` | `["Set pressure to 5 "]` | Digit ending and trailing space. |

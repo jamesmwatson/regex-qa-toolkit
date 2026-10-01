@@ -16,14 +16,14 @@ These checks can find numbers of a specific 'shape' or pattern but they can't te
 
 **If found:** Compare it with the source before changing anything. A blind comma-to-point replacement could turn `1,234` into a completely different number.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Thickness: 12,5 mm."` | `["12,5"]` | Candidate German decimal in an English target. |
 | `"Offset: -0,5 mm."` | `["-0,5"]` | Signed decimal. |
-| `"3,14159 versus 3.14159."` | `["3,14159"]` |  |
+| `"3,14159 versus 3.14159."` | `["3,14159"]` | Finds the comma-decimal form but leaves the point-decimal form alone. |
 | `"Thickness: 12.5 mm."` | `[]` | Useful non-match: decimal point. |
 | `"Batch: 1,234."` | `["1,234"]` | Known ambiguity: English thousands grouping may be correct. |
-| `"Value: 1.234,56 EUR."` | `[]` | Excluded mixed separators, not a clean bill of health. |
+| `"Value: 1.234,56 EUR."` | `[]` | Mixed separators are outside this narrow pattern; no match does not mean the number is correct. |
 | `"Value: 1,234,567."` | `[]` | Excluded multiple separators. |
 | `"Thickness: 12,5mm."` | `[]` | Known miss: unit attached to number; review with N02 and rerun. |
 | `"ID A12,5B"` | `[]` | Do not match inside an identifier. |
@@ -42,16 +42,16 @@ These checks can find numbers of a specific 'shape' or pattern but they can't te
 
 **If found:** Check that it really is a measurement, then insert the kind of space required by the project. That may be an ordinary space or a non-breaking one. Keep the value and unit case unchanged.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Length: 25mm."` | `["25mm"]` | Candidate missing space. |
 | `"Temperature: -5°C."` | `["-5°C"]` | Degree-Celsius symbol. |
 | `"Pressure: 1,2bar."` | `["1,2bar"]` | Comma decimal recognised, not approved. |
 | `"Length: 25 mm."` | `[]` | Useful non-match. |
-| `"Length: 25\u00a0mm."` | `[]` | Existing NBSP is acceptable to this check. |
-| `"Length: 25MM."` | `[]` | Wrong unit case needs a separate check. |
+| `"Length: 25\u00a0mm."` | `[]` | Already separated by a non-breaking space, so there is no match. |
+| `"Length: 25MM."` | `[]` | `MM` is outside this case-sensitive unit list. |
 | `"Type A25mm"` | `[]` | Attached identifier excluded. |
-| `"Part 25mm-series"` | `["25mm"]` | Known false positive: product naming. |
+| `"Part 25mm-series"` | `["25mm"]` | This may be a product name rather than a measurement, so it needs context. |
 | `"Length: 25m."` | `[]` | Unlisted unit: known coverage gap. |
 
 ## N03 — Hyphenated measurement range
@@ -68,7 +68,7 @@ These checks can find numbers of a specific 'shape' or pattern but they can't te
 
 **If found:** Check the source and surrounding text, then change the separator if the project style requires it. In the fictional project used here, `15-20 mm` becomes `15–20 mm`.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
 | `"Length: 15-20 mm."` | `["15-20 mm"]` | Candidate hyphenated range. |
 | `"Pressure: 0.8 - 1.2 bar."` | `["0.8 - 1.2 bar"]` | Spaced hyphen and decimal points. |
@@ -77,7 +77,7 @@ These checks can find numbers of a specific 'shape' or pattern but they can't te
 | `"Length: 15 to 20 mm."` | `[]` | Written range. |
 | `"Temperature: -5-10 °C."` | `[]` | Signed range excluded. |
 | `"Code A15-20 mm"` | `[]` | Identifier prefix excluded. |
-| `"Calculation: 15-20 mm."` | `["15-20 mm"]` | Known false positive: subtraction in context. |
+| `"Calculation: 15-20 mm."` | `["15-20 mm"]` | This may be subtraction rather than a range, so the surrounding text matters. |
 
 ## N04 — All-numeric segment filter
 
@@ -93,12 +93,11 @@ These checks can find numbers of a specific 'shape' or pattern but they can't te
 
 **If found:** Compare source and target and leave it alone if the value and formatting are appropriate. This rule is for finding material to inspect, not fixing it automatically.
 
-| Input | Expected matches | Review note |
+| Input | Expected matches | What this shows |
 | --- | --- | --- |
-| `"123"` | `["123"]` | Select an integer. |
+| `"123"` | `["123"]` | A simple numeric-only segment is selected for review. |
 | `" -12,5 "` | `[" -12,5 "]` | Select a signed value with surrounding spaces. |
 | `"1,234"` | `["1,234"]` | Ambiguous grouping; still only a filter. |
-| `"123\n"` | `["123"]` | The end anchor permits a terminal LF; see test conventions. |
 | `"12 mm"` | `[]` | Useful non-match: contains a unit. |
 | `"Part 123"` | `[]` | Not numeric-only. |
 | `"1,234,567"` | `[]` | Multiple separators excluded. |
