@@ -1,10 +1,6 @@
 # Numbers and measurements
 
-These checks can find numbers of a specific 'shape' or pattern but they can't tell what the numbers actually mean. It's important to choose the right target language conventions and project style before correcting a match.
-
-The examples below double as test fixtures. `[]` means the pattern should not match.
-
-[Toolkit overview](../README.md) · [Test conventions](../tests/test-cases.md)
+These checks can find numbers of a specific 'shape' or pattern but they can't tell what the numbers actually mean. It's important to choose the right target language conventions and project style before correcting a match
 
 ## N01 — Comma inside a number
 
@@ -24,7 +20,7 @@ The examples below double as test fixtures. `[]` means the pattern should not ma
 | --- | --- | --- |
 | `"Thickness: 12,5 mm."` | `["12,5"]` | Candidate German decimal in an English target. |
 | `"Offset: -0,5 mm."` | `["-0,5"]` | Signed decimal. |
-| `"3,14159 versus 3.14159."` | `["3,14159"]` | Retained original fixture. |
+| `"3,14159 versus 3.14159."` | `["3,14159"]` |  |
 | `"Thickness: 12.5 mm."` | `[]` | Useful non-match: decimal point. |
 | `"Batch: 1,234."` | `["1,234"]` | Known ambiguity: English thousands grouping may be correct. |
 | `"Value: 1.234,56 EUR."` | `[]` | Excluded mixed separators, not a clean bill of health. |

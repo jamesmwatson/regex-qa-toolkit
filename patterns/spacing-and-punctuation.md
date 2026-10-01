@@ -2,10 +2,6 @@
 
 I’d use these checks to pick up small spacing and punctuation problems in English prose. Code, tables and other languages need a different approach: what looks like an extra space may be intentional.
 
-The examples below double as test fixtures. JSON strings make invisible characters visible; `[]` means the pattern should not match.
-
-[Toolkit overview](../README.md) · [Test conventions](../tests/test-cases.md)
-
 ## S01 — Repeated horizontal whitespace
 
 ```regex
@@ -23,7 +19,7 @@ The examples below double as test fixtures. JSON strings make invisible characte
 | Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"Press  start."` | `["  "]` | Candidate: accidental double space. |
-| `"This  sentence  has  double  spaces."` | `["  ", "  ", "  ", "  "]` | Retained original fixture; find every run. |
+| `"This  sentence  has  double  spaces."` | `["  ", "  ", "  ", "  "]` |  find every run. |
 | `"Press \tstart."` | `[" \t"]` | Mixed horizontal whitespace. |
 | `"Press\u00a0\u202fstart."` | `["\u00a0\u202f"]` | Two different non-breaking spaces. |
 | `"Press start."` | `[]` | Useful non-match: one space. |
@@ -47,7 +43,7 @@ The examples below double as test fixtures. JSON strings make invisible characte
 
 | Input | Expected matches | Review note |
 | --- | --- | --- |
-| `"Space before punctuation !"` | `[" !"]` | Retained original fixture. |
+| `"Space before punctuation !"` | `[" !"]` |  |
 | `"Check , then continue."` | `[" ,"]` | Candidate: space before comma. |
 | `"Ready\u202f?"` | `["\u202f?"]` | Narrow NBSP in English target. |
 | `"Ready?"` | `[]` | Useful non-match. |
@@ -70,7 +66,7 @@ The examples below double as test fixtures. JSON strings make invisible characte
 
 | Input | Expected matches | Review note |
 | --- | --- | --- |
-| `"There are two dots.. right here."` | `[".."]` | Retained original fixture. |
+| `"There are two dots.. right here."` | `[".."]` |  |
 | `"Done.."` | `[".."]` | Detect at end of segment. |
 | `"..Start"` | `[".."]` | Detect at start without consuming adjacent letters. |
 | `"Wait..."` | `[]` | Useful non-match: three-dot ellipsis. |

@@ -2,10 +2,6 @@
 
 These checks help me find repeated words and possible missing punctuation in translated text. Each match still needs to be read in context; neither check tells me whether the translation conveys the source correctly.
 
-The examples below double as test fixtures. JSON strings make invisible characters visible; `[]` means the pattern should not match.
-
-[Toolkit overview](../README.md) · [Test conventions](../tests/test-cases.md)
-
 ## T01 — Consecutive repeated English words
 
 ```regex

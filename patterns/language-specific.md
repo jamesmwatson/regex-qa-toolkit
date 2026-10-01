@@ -2,10 +2,6 @@
 
 I’d use these checks to review English spelling and phrasing against a project’s house style. The useful question is whether a form is right for this text, rather than whether one variant is always better than another.
 
-The examples below double as test fixtures. JSON strings make invisible characters visible; `[]` means the pattern should not match.
-
-[Toolkit overview](../README.md) · [Test conventions](../tests/test-cases.md)
-
 ## L01 — Color / colour inventory
 
 ```regex
