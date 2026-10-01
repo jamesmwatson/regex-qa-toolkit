@@ -1,6 +1,8 @@
 # Numbers and measurements
 
-Numeric shape is not numeric meaning. Confirm the value against the source; select the target locale and project style before correcting a match.
+These checks can find numbers of a specific 'shape' or pattern but they can't tell what the numbers actually mean. It's important to choose the right target language conventions and project style before correcting a match.
+
+The examples below double as test fixtures. `[]` means the pattern should not match.
 
 [Toolkit overview](../README.md) · [Test conventions](../tests/test-cases.md)
 
@@ -10,19 +12,15 @@ Numeric shape is not numeric meaning. Confirm the value against the source; sele
 (?<![\w.,])[-+]?[0-9]+,[0-9]+(?!\w|[.,][0-9])
 ```
 
-**QA purpose:** Find comma-number tokens for review when the target locale expects decimal points.
+**What it catches:** Numbers containing a comma, such as `12,5`.
 
-**Language / locale assumptions:** ASCII digits, optional ASCII sign, one comma and no other separator. Suitable for a scoped DE→EN decimal-format review, not for identifying all numeric formats.
+**When I'd use it:** In a DE→EN project, for example, to pull together numbers that may still be using a German decimal comma in the English target.
 
-**Limits / likely false positives:** “1,234” may be a valid English thousands grouping or a decimal in another locale. This deliberately excludes mixed/grouped forms such as “1.234,56”; it cannot infer numeric value or compare it with the source. A number attached to a unit, such as “12,5mm”, is excluded by the token guard too; N02 can catch the missing space, then N01 can find the comma on a second pass.
+**Watch out for:** A match is not automatically wrong. `1,234` may be a perfectly valid English thousands grouping, and this check deliberately ignores more complicated forms such as `1.234,56`. It also won't match `12,5mm` while the unit is attached; N02 can catch that first.
 
-**Action:** Flag only. Confirm value and grouping against the source before changing any separator. A blanket comma-to-point replacement can change a value by a factor of 1,000.
+**If found:** Compare it with the source before changing anything. A blind comma-to-point replacement could turn `1,234` into a completely different number.
 
-**Provenance:** Adapted from the original number checks and translator measurement notes; added token boundaries and conservative scope.
-
-Examples are executable fixtures: JSON strings expose invisible characters; `[]` means no match.
-
-| Input | Expected matched spans | Review note |
+| Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"Thickness: 12,5 mm."` | `["12,5"]` | Candidate German decimal in an English target. |
 | `"Offset: -0,5 mm."` | `["-0,5"]` | Signed decimal. |
@@ -40,19 +38,15 @@ Examples are executable fixtures: JSON strings expose invisible characters; `[]`
 (?<![\w.,])[-+]?[0-9]+(?:[.,][0-9]+)?(?:mm|cm|kg|kPa|bar|°C)(?!\w)
 ```
 
-**QA purpose:** Find a number attached directly to a selected unit symbol, such as “25mm”.
+**What it catches:** Measurements where the value and unit have run together, such as `25mm` or `1,2bar`.
 
-**Language / locale assumptions:** A project style requiring a space between the value and these exact symbols. Both decimal separators are recognised without endorsing either. Unit case is significant: do not turn on ignore-case.
+**When I'd use it:** On technical material where the project style requires a space between a number and units such as `mm`, `kg` or `bar`.
 
-**Limits / likely false positives:** The small unit list is deliberate; it is not a unit parser. Product identifiers can resemble measurements. Compound units, powers and unlisted units are not fully checked; an unlisted form may be missed or only partly matched.
+**Watch out for:** The unit list is deliberately small, and product names or identifiers can look like measurements. This isn't intended to be a general-purpose unit parser.
 
-**Action:** Flag for review. Confirm it is a measurement, then use the space required by the project, which may be non-breaking. Preserve unit case and value.
+**If found:** Check that it really is a measurement, then insert the kind of space required by the project. That may be an ordinary space or a non-breaking one. Keep the value and unit case unchanged.
 
-**Provenance:** Adapted from translator notes on number + abbreviated-unit formatting; rewritten as a narrow missing-space check.
-
-Examples are executable fixtures: JSON strings expose invisible characters; `[]` means no match.
-
-| Input | Expected matched spans | Review note |
+| Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"Length: 25mm."` | `["25mm"]` | Candidate missing space. |
 | `"Temperature: -5°C."` | `["-5°C"]` | Degree-Celsius symbol. |
@@ -70,19 +64,15 @@ Examples are executable fixtures: JSON strings expose invisible characters; `[]`
 (?<![\w.,+\-−])[0-9]+(?:[.,][0-9]+)?[ \t\u00A0\u202F]*-[ \t\u00A0\u202F]*[0-9]+(?:[.,][0-9]+)?[ \t\u00A0\u202F]*(?:mm|cm|kg|kPa|bar|°C)(?!\w)
 ```
 
-**QA purpose:** Find positive measurement ranges using an ASCII hyphen when the project calls for an en dash or “to”.
+**What it catches:** Measurement ranges written with an ASCII hyphen, such as `15-20 mm`.
 
-**Language / locale assumptions:** Unsigned ASCII numbers; one optional decimal part per endpoint; selected case-sensitive unit symbols. Either decimal separator is accepted for detection.
+**When I'd use it:** When the project style calls for an en dash or the word `to` in numerical ranges.
 
-**Limits / likely false positives:** Cannot distinguish a range from subtraction or a product code. Signed ranges are intentionally excluded. Does not check ascending order or validate mixed decimal styles.
+**Watch out for:** Regex can't tell whether `15-20` is really a range rather than subtraction or part of a product code. Signed ranges are outside this check.
 
-**Action:** Flag for review. For the fictional house style, “15-20 mm” becomes “15–20 mm”; other projects may require “15 to 20 mm”. There is no universal dash or spacing rule.
+**If found:** Check the source and surrounding text, then change the separator if the project style requires it. In the fictional project used here, `15-20 mm` becomes `15–20 mm`.
 
-**Provenance:** Adapted from a generated workflow suggestion in the earlier notes; narrowed and independently tested here. Not evidence of deployment.
-
-Examples are executable fixtures: JSON strings expose invisible characters; `[]` means no match.
-
-| Input | Expected matched spans | Review note |
+| Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"Length: 15-20 mm."` | `["15-20 mm"]` | Candidate hyphenated range. |
 | `"Pressure: 0.8 - 1.2 bar."` | `["0.8 - 1.2 bar"]` | Spaced hyphen and decimal points. |
@@ -99,19 +89,15 @@ Examples are executable fixtures: JSON strings expose invisible characters; `[]`
 ^[ \t\u00A0\u202F]*[+-]?[0-9]+(?:[.,][0-9]+)?[ \t\u00A0\u202F]*$
 ```
 
-**QA purpose:** Select simple numeric-only segments for a focused source–target review. This is a triage filter, not an error detector.
+**What it catches:** Segments made up almost entirely of a single number.
 
-**Language / locale assumptions:** ASCII digits, optional sign and at most one comma or point; surrounding horizontal whitespace permitted. Run per segment with multiline off.
+**When I'd use it:** As a quick filter for reviewing source and target values together. Numeric-only segments are easy to overlook because there is very little linguistic context around them.
 
-**Limits / likely false positives:** Cannot distinguish decimal separators from grouping. Does not cover scientific notation, dates, percentages or grouped numbers with multiple separators. A numeric-only target can be entirely correct.
+**Watch out for:** A match says nothing about whether the value or separator is correct. Dates, percentages, scientific notation and more complex grouped numbers are outside this deliberately narrow pattern.
 
-**Action:** Filter for review; compare value and formatting with source and locale. Never change or discard a segment merely because it matches.
+**If found:** Compare source and target and leave it alone if the value and formatting are appropriate. This rule is for finding material to inspect, not fixing it automatically.
 
-**Provenance:** Illustrative implementation of the supplied all-numeric-segment candidate.
-
-Examples are executable fixtures: JSON strings expose invisible characters; `[]` means no match.
-
-| Input | Expected matched spans | Review note |
+| Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"123"` | `["123"]` | Select an integer. |
 | `" -12,5 "` | `[" -12,5 "]` | Select a signed value with surrounding spaces. |

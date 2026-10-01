@@ -1,6 +1,8 @@
 # Spacing and punctuation
 
-Enable these for the relevant English prose, not indiscriminately across code, tables or other locales.
+I’d use these checks to pick up small spacing and punctuation problems in English prose. Code, tables and other languages need a different approach: what looks like an extra space may be intentional.
+
+The examples below double as test fixtures. JSON strings make invisible characters visible; `[]` means the pattern should not match.
 
 [Toolkit overview](../README.md) · [Test conventions](../tests/test-cases.md)
 
@@ -10,19 +12,15 @@ Enable these for the relevant English prose, not indiscriminately across code, t
 [ \t\u00A0\u202F]{2,}
 ```
 
-**QA purpose:** Find runs of two or more horizontal whitespace characters in prose.
+**What it catches:** Extra spaces or combinations of spaces and tabs, such as the double space in `Press  start.`
 
-**Language / locale assumptions:** Use where the project expects single inter-word spaces. Explicitly includes space, tab, NBSP (U+00A0) and narrow NBSP (U+202F); excludes line breaks.
+**When I'd use it:** During a final pass over translated prose where I’d expect single spaces between words.
 
-**Limits / likely false positives:** Alignment, code and intentionally spaced tables can match. A match does not tell you which space character should survive.
+**Watch out for:** Tables, code and aligned text may use repeated spaces deliberately. The check includes ordinary spaces, tabs, non-breaking spaces and narrow non-breaking spaces, but leaves line breaks alone.
 
-**Action:** Review first. Replacing a reviewed run with one ordinary space is reasonably safe only in plain prose whose style requires ordinary spaces. Do not normalise non-breaking spaces globally.
+**If found:** Check whether the spacing serves a purpose. In ordinary prose, I’d usually reduce an accidental run to one space, keeping a non-breaking space where the text or project style needs it.
 
-**Provenance:** Adapted from the original repository and translator notes; horizontal scope narrowed for this edition.
-
-Examples are executable fixtures: JSON strings expose invisible characters; `[]` means no match.
-
-| Input | Expected matched spans | Review note |
+| Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"Press  start."` | `["  "]` | Candidate: accidental double space. |
 | `"This  sentence  has  double  spaces."` | `["  ", "  ", "  ", "  "]` | Retained original fixture; find every run. |
@@ -39,19 +37,15 @@ Examples are executable fixtures: JSON strings expose invisible characters; `[]`
 [ \t\u00A0\u202F]+[.,;:!?]
 ```
 
-**QA purpose:** Find whitespace immediately before selected punctuation marks.
+**What it catches:** Spaces before punctuation, such as `Check , then continue.` or `Ready ?`
 
-**Language / locale assumptions:** English prose under a style with no spaces before these marks. The matched span includes the punctuation.
+**When I'd use it:** When reviewing English target text where the project style calls for punctuation to follow the preceding word directly.
 
-**Limits / likely false positives:** French spacing before some punctuation is a counterexample to applying this rule across locales. A decimal written as “0 .5”, mathematical notation or a leading ellipsis needs contextual review.
+**Watch out for:** Spacing before some punctuation is normal in French, so this is an English-target check. Mathematical notation, a number such as `0 .5`, or a spaced ellipsis needs a closer look. The match includes the punctuation as well as the preceding whitespace; line breaks are excluded.
 
-**Action:** Flag for review; remove the whitespace only after confirming the punctuation and locale. Never apply as a multilingual cleanup.
+**If found:** Read the surrounding text and remove an accidental space, keeping the punctuation. If the match belongs to another language or to notation, I’d check the relevant convention before changing it.
 
-**Provenance:** Adapted from the original repository and translator notes; excludes line breaks.
-
-Examples are executable fixtures: JSON strings expose invisible characters; `[]` means no match.
-
-| Input | Expected matched spans | Review note |
+| Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"Space before punctuation !"` | `[" !"]` | Retained original fixture. |
 | `"Check , then continue."` | `[" ,"]` | Candidate: space before comma. |
@@ -66,19 +60,15 @@ Examples are executable fixtures: JSON strings expose invisible characters; `[]`
 (?<!\.)\.\.(?!\.)
 ```
 
-**QA purpose:** Find two dots that may be an accidental doubled full stop or a malformed ellipsis.
+**What it catches:** Two consecutive dots, such as `Done..`, which may be a doubled full stop or an incomplete ellipsis.
 
-**Language / locale assumptions:** Plain prose using the ASCII full stop. A three-dot ellipsis and the single ellipsis character are outside this check.
+**When I'd use it:** In a punctuation pass over translated prose or UI strings, where an extra or missing dot is easy to overlook.
 
-**Limits / likely false positives:** Paths, code and deliberately written ranges can contain two dots. The check cannot decide whether one dot or an ellipsis was intended.
+**Watch out for:** Paths such as `../manual`, code and some range notation legitimately contain `..`. The check finds exactly two ordinary full stops; it leaves `...` and `…` alone.
 
-**Action:** Flag for human review; no automatic replacement.
+**If found:** Check the sentence and, where useful, the source to decide whether a full stop or an ellipsis was intended. I’d leave valid notation alone and query ambiguous wording rather than choose a replacement automatically.
 
-**Provenance:** Adapted from the original punctuation check; repaired boundaries and end-of-segment handling.
-
-Examples are executable fixtures: JSON strings expose invisible characters; `[]` means no match.
-
-| Input | Expected matched spans | Review note |
+| Input | Expected matches | Review note |
 | --- | --- | --- |
 | `"There are two dots.. right here."` | `[".."]` | Retained original fixture. |
 | `"Done.."` | `[".."]` | Detect at end of segment. |
@@ -87,4 +77,3 @@ Examples are executable fixtures: JSON strings expose invisible characters; `[]`
 | `"Wait…"` | `[]` | Unicode ellipsis. |
 | `"Done."` | `[]` | Single full stop. |
 | `"../manual"` | `[".."]` | Known false positive: relative path. |
-
